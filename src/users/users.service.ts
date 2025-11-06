@@ -19,9 +19,6 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  /**
-   * ดูรายการ users ทั้งหมด (เฉพาะที่ยังไม่ถูกลบ soft delete)
-   */
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }
