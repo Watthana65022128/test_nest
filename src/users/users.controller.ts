@@ -26,9 +26,10 @@ export class UsersController {
   /**
    * GET /users/:id
    * ดูข้อมูล user ตาม id
+   * @throws NotFoundException (404) ถ้าไม่พบ user
    */
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<User | null> {
+  findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(Number(id));
   }
 }

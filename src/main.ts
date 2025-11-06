@@ -7,7 +7,13 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // ลบ properties ที่ไม่ได้กำหนดใน DTO ออกโดยอัตโนมัติ
+      forbidNonWhitelisted: true, // ส่ง error ถ้ามี properties ที่ไม่ได้กำหนดใน DTO
+      transform: true, // แปลง payload เป็น DTO instance โดยอัตโนมัติ
+    }),
+  );
   app.useGlobalInterceptors(new TransformInterceptor())
   app.useGlobalFilters(new HttpExceptionFilter());
 

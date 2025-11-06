@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -80,6 +80,7 @@ export class AuthController {
    * }
    */
   @Post('login')
+  @HttpCode(HttpStatus.OK)  // บังคับให้ส่ง status 200 แทน 201
   @ApiOperation({ summary: 'เข้าสู่ระบบ' })
   @ApiResponse({
     status: 200,

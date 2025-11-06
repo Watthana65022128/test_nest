@@ -11,6 +11,4 @@ import { User } from './entities/user.entity';
   exports: [UsersService],
 })
 export class UsersModule {
-  // ไม่ต้อง configure middleware ที่นี่แล้ว
-  // เพราะ AppModule จัดการให้แบบ global แล้ว
 }
