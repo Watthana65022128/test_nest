@@ -44,6 +44,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         age: user.age,
+        role: user.role,
       },
     };
   }
@@ -83,6 +84,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         age: user.age,
+        role: user.role,
       },
     };
   }

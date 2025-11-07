@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
 /**
@@ -44,7 +44,7 @@ export class UsersService {
   findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { email },
-      select: ['id', 'name', 'email', 'password', 'age', 'createdAt', 'deletedAt']
+      select: ['id', 'name', 'email', 'password', 'age', 'role', 'createdAt', 'deletedAt']
     });
   }
 
@@ -52,6 +52,7 @@ export class UsersService {
    * สร้าง user ใหม่
    * ใช้โดย AuthService สำหรับการ register เท่านั้น
    * Password จะถูก hash ก่อนบันทึกลงฐานข้อมูล
+   * Role จะถูกบังคับเป็น MEMBER เสมอ (ป้องกันการสร้าง admin ผ่าน register)
    */
   async create(userData: Partial<User>): Promise<User> {
     // Hash password ถ้ามี password ใน userData
@@ -60,7 +61,11 @@ export class UsersService {
       userData.password = await bcrypt.hash(userData.password, saltRounds);
     }
 
-    const user = this.usersRepository.create(userData);
+    // บังคับให้ role เป็น MEMBER เสมอเมื่อ register
+    const user = this.usersRepository.create({
+      ...userData,
+      role: UserRole.MEMBER,
+    });
     return this.usersRepository.save(user);
   }
 
