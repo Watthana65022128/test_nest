@@ -1,7 +1,9 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 /**
@@ -19,10 +21,12 @@ export class UsersController {
 
   /**
    * GET /users
-   * ดูรายการ users ทั้งหมด (เฉพาะที่ยังไม่ถูกลบ)
+   * ดูรายการ users ทั้งหมด (เฉพาะ ADMIN เท่านั้น)
    */
   @Get()
-  @ApiOperation({ summary: 'ดูรายการ Users ทั้งหมด' })
+  @Roles(UserRole.ADMIN) // เฉพาะ Admin เท่านั้น
+  @UseGuards(JwtAuthGuard, RolesGuard) // ต้องใช้ทั้ง JwtAuthGuard และ RolesGuard
+  @ApiOperation({ summary: 'ดูรายการ Users ทั้งหมด (Admin only)' })
   @ApiResponse({
     status: 200,
     description: 'ดึงรายการ users สำเร็จ',
@@ -33,12 +37,14 @@ export class UsersController {
           name: 'John Doe',
           email: 'john@example.com',
           age: 25,
+          role: 'member',
           createdAt: '2024-01-01T00:00:00.000Z'
         },
       ]
     }
   })
   @ApiResponse({ status: 401, description: 'ไม่มี Token หรือ Token ไม่ถูกต้อง' })
+  @ApiResponse({ status: 403, description: 'ไม่มีสิทธิ์เข้าถึง (ต้องเป็น Admin)' })
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
