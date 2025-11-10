@@ -19,14 +19,9 @@ import { UsersModule } from '../users/users.module';
 
     // ตั้งค่า JWT Module
     JwtModule.register({
-      // Secret key สำหรับ sign และ verify JWT
-      // ในการใช้งานจริง ควรเก็บใน environment variable
-      secret: 'your-secret-key-here', // TODO: ย้ายไป .env
-
-      // ตั้งค่าเวลาหมดอายุของ token
+      secret: process.env.JWT_SECRET, 
       signOptions: {
-        expiresIn: '1d', // token หมดอายุใน 1 วัน
-        // อื่นๆ: '60s', '1h', '7d', '30d'
+        expiresIn: '1d', 
       },
     }),
   ],

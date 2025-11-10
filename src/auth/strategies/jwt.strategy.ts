@@ -50,13 +50,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('No token provided');
     }
 
-    // ตรวจสอบว่า token อยู่ใน blacklist หรือไม่
-    const isBlacklisted = await this.authService.isTokenBlacklisted(token);
-
-    if (isBlacklisted) {
-      throw new UnauthorizedException('Token has been revoked (logged out)');
-    }
-
     // payload จะมี: { sub: userId, email: userEmail, iat: issuedAt, exp: expiresAt }
     const user = await this.authService.validateUser(payload);
 

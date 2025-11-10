@@ -2,7 +2,6 @@ import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { User } from './users/entities/user.entity';
-import { TokenBlacklist } from './auth/entities/token-blacklist.entity';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
@@ -19,7 +18,7 @@ import { LoggerMiddleware } from './comon/middleware/logger.midleware';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User, TokenBlacklist],
+      entities: [User],
       synchronize: true, // dev เท่านั้น
     }),
     UsersModule,
