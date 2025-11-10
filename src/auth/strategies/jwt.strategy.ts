@@ -22,34 +22,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       // ห้าม ignore token ที่หมดอายุ (ถ้า true = ยอมรับ token หมดอายุ)
       ignoreExpiration: false,
 
-      // Secret key สำหรับ verify token (ควรเก็บใน environment variable)
-      secretOrKey: 'your-secret-key-here', // TODO: ย้ายไป .env
+      // Secret key สำหรับ verify token (อ่านจาก environment variable)
+      secretOrKey: process.env.JWT_SECRET || 'default-secret-key',
     });
   }
 
   /**
    * Method นี้จะถูกเรียกอัตโนมัติหลังจาก token ถูก verify แล้ว
    *
-   * @param req - Request object (เพราะเรา set passReqToCallback: true)
    * @param payload - ข้อมูลที่ decode จาก JWT token
    * @returns User object ที่จะถูกแนบเข้ากับ request.user
    *
    * ขั้นตอน:
-   * 1. ดึง token จาก Authorization header
-   * 2. ตรวจสอบว่า token อยู่ใน blacklist หรือไม่
-   * 3. ถ้าอยู่ใน blacklist = ปฏิเสธ
-   * 4. ถ้าไม่อยู่ใน blacklist = ดึงข้อมูล user และ allow
+   * 1. ดึงข้อมูล user จาก payload
+   * 2. Return user object เพื่อแนบเข้ากับ request.user
    */
-  async validate(req: any, payload: any) {
-    // ดึง token จาก Authorization header
-    // Format: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.replace('Bearer ', '');
-
-    if (!token) {
-      throw new UnauthorizedException('No token provided');
-    }
-
+  async validate(payload: any) {
     // payload จะมี: { sub: userId, email: userEmail, iat: issuedAt, exp: expiresAt }
     const user = await this.authService.validateUser(payload);
 
