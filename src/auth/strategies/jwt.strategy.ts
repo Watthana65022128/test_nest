@@ -24,10 +24,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
       // Secret key สำหรับ verify token (ควรเก็บใน environment variable)
       secretOrKey: 'your-secret-key-here', // TODO: ย้ายไป .env
-
-      // Pass request object เข้า validate() method
-      // เพื่อให้เข้าถึง headers และดึง token ออกมาตรวจสอบ blacklist
-      passReqToCallback: true,
     });
   }
 
