@@ -1,4 +1,5 @@
 import { Controller, Post, Body, Get, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -16,6 +17,9 @@ export class AuthController {
   /**
    * POST /auth/register
    * สมัครสมาชิกใหม่
+   *
+   * Rate Limiting: จำกัด 3 ครั้งต่อ 1 ชั่วโมง (3600000 ms)
+   * เพื่อป้องกันการสร้าง fake accounts
    *
    * Request Body:
    * {
@@ -37,6 +41,7 @@ export class AuthController {
    * }
    */
   @Post('register')
+  @Throttle({ short: { limit: 3, ttl: 3600000 } }) // 3 requests ต่อ 1 ชั่วโมง
   @ApiOperation({ summary: 'สมัครสมาชิกใหม่' })
   @ApiResponse({
     status: 201,
@@ -54,6 +59,7 @@ export class AuthController {
     }
   })
   @ApiResponse({ status: 409, description: 'Email นี้ถูกใช้งานแล้ว' })
+  @ApiResponse({ status: 429, description: 'ส่ง request มากเกินไป (Rate Limit Exceeded)' })
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
@@ -61,6 +67,9 @@ export class AuthController {
   /**
    * POST /auth/login
    * เข้าสู่ระบบ
+   *
+   * Rate Limiting: จำกัด 5 ครั้งต่อ 15 นาที (900000 ms)
+   * เพื่อป้องกัน Brute Force Attack
    *
    * Request Body:
    * {
@@ -80,6 +89,7 @@ export class AuthController {
    * }
    */
   @Post('login')
+  @Throttle({ short: { limit: 5, ttl: 900000 } }) // 5 requests ต่อ 15 นาที
   @HttpCode(HttpStatus.OK)  // บังคับให้ส่ง status 200 แทน 201
   @ApiOperation({ summary: 'เข้าสู่ระบบ' })
   @ApiResponse({
@@ -98,6 +108,7 @@ export class AuthController {
     }
   })
   @ApiResponse({ status: 401, description: 'Email หรือ Password ไม่ถูกต้อง' })
+  @ApiResponse({ status: 429, description: 'ส่ง request มากเกินไป กรุณารอ 15 นาที' })
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
