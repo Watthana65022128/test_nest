@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
 
 /**
@@ -14,7 +15,12 @@ import { AuthService } from '../auth.service';
  */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthService) {
+  constructor(
+    private authService: AuthService,
+    configService: ConfigService,
+  ) {
+    const secret = configService.get<string>('JWT_SECRET') || 'default-secret-key';
+
     super({
       // ดึง JWT จาก Authorization header แบบ Bearer token
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -23,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
 
       // Secret key สำหรับ verify token (อ่านจาก environment variable)
-      secretOrKey: process.env.JWT_SECRET || 'default-secret-key',
+      secretOrKey: secret,
     });
   }
 

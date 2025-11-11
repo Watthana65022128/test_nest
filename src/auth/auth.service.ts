@@ -89,6 +89,7 @@ export class AuthService {
    * ใช้โดย JWT Strategy
    */
   async validateUser(payload: any): Promise<User> {
+    console.log(payload)
     const user = await this.usersService.findOne(payload.sub);
     if (!user) {
       throw new UnauthorizedException();

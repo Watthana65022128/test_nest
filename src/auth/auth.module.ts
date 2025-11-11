@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -17,12 +18,16 @@ import { UsersModule } from '../users/users.module';
     // Import PassportModule สำหรับ authentication strategies
     PassportModule,
 
-    // ตั้งค่า JWT Module
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'default-secret-key',
-      signOptions: {
-        expiresIn: '1d',
-      },
+    // ตั้งค่า JWT Module แบบ async เพื่อให้ ConfigService โหลดก่อน
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') || 'default-secret-key',
+        signOptions: {
+          expiresIn: '1d',
+        },
+      }),
     }),
   ],
 
